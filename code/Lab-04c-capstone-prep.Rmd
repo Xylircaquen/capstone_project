@@ -13,6 +13,8 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Introduction
 
+hello
+
 A lot of the mechanics behind data science work is messy, but today we're going to do our best to get started on the right foot and sidestep some of that! This document is going to help you get situated when you start working on your capstone project. There are many approaches to an open-ended problem like a research project, and this is just one of them; as you learn what you like and don't like about R and R markdown, about how to structure your work, feel free to change things. Burn it all down and start again, if you choose!
 
 This is just one example of what good might look like.
