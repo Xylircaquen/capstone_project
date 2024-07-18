@@ -36,6 +36,9 @@ We're going to start building our toolbox by adding our functions. Whenever we w
 # Consider a unique random seed: set.seed(ANumberThatYouHappenToLike)
 #
 
+library(tidyverse)
+
+set.seed(0)
 ```
 
 ## Data Import
@@ -51,13 +54,42 @@ Typically, I split this section into two pieces; one explicitly for imports and 
 #read_csv()...
 #data <- left_join(data, otherdata, by = matchingFeature)
 #
+
+parkinsons_dataset <- read_csv("../data/dataset.csv")
 ```
 
 
 ```{r dataCleaning}
-#
+# turn yes and no into logicals
+parkinsons_dataset <- parkinsons_dataset %>% 
+  mutate(
+    across(
+      c(4, 7:10
+      ),
+      ~ case_when(
+        . == "No" ~ FALSE,
+        . == "-" ~ NA,
+        TRUE ~ TRUE
+      )
+    )
+  )
+
+# turn everything that should be a factor into a factor (find out which ones other than gender)
+parkinsons_dataset <- parkinsons_dataset %>%
+  mutate(Gender = as.factor(Gender))
+
 #drop.na()...
-#
+parkinsons_dataset <- parkinsons_dataset %>% 
+  mutate(
+    across(
+      everything(),
+      ~ case_when(
+        . == "-" ~ NA,
+        TRUE ~ .
+      )
+    )
+  ) %>% 
+  drop_na()
 ```
 
 ## Exploratory Data Analysis
