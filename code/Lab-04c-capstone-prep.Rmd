@@ -49,7 +49,7 @@ Typically, I split this section into two pieces; one explicitly for imports and 
 
 **Another important note** is that you should take notes in comments (lines beginning with #) to keep track of what occurs here - it's typically requested when you author research papers to note how many observations were removed, and for what reasons.
 
-```{r dataImport}
+```{r data_import}
 #
 #read_csv()...
 #data <- left_join(data, otherdata, by = matchingFeature)
@@ -58,27 +58,8 @@ Typically, I split this section into two pieces; one explicitly for imports and 
 parkinsons_dataset <- read_csv("../data/dataset.csv")
 ```
 
-
-```{r dataCleaning}
-# turn yes and no into logicals
-parkinsons_dataset <- parkinsons_dataset %>% 
-  mutate(
-    across(
-      c(4, 7:10
-      ),
-      ~ case_when(
-        . == "No" ~ FALSE,
-        . == "-" ~ NA,
-        TRUE ~ TRUE
-      )
-    )
-  )
-
-# turn everything that should be a factor into a factor (find out which ones other than gender)
-parkinsons_dataset <- parkinsons_dataset %>%
-  mutate(Gender = as.factor(Gender))
-
-#drop.na()...
+```{r data_cleaning}
+# turn all - into NA DONE
 parkinsons_dataset <- parkinsons_dataset %>% 
   mutate(
     across(
@@ -89,6 +70,48 @@ parkinsons_dataset <- parkinsons_dataset %>%
       )
     )
   )
+
+# turn yes and no into logicals DONE
+parkinsons_dataset <- parkinsons_dataset %>% 
+  mutate(
+    across(4,
+      ~ case_when(
+        . == "Yes" ~ TRUE,
+        . == "No" ~ FALSE
+      )
+    )
+  )
+
+# turn yes and no for medication into medication name or none DONE
+parkinsons_dataset <- parkinsons_dataset %>% 
+  mutate(
+    across(7:10,
+      ~ case_when(
+        substr(., 1, 3) == "Yes" ~ substr(., 7, nchar(.) - 1),
+        . == "No" ~ "None"
+      )
+    )
+  )
+
+# turn columns into factors
+parkinsons_dataset$Gender <- parkinsons_dataset$Gender %>%
+  as.factor()
+
+parkinsons_dataset[[13]] <- parkinsons_dataset[[13]] %>%
+  factor(levels = c("1", "1.5", "2", "2.5", "3", "3.5", "4", "4.5", "5"))
+```
+
+```{r data_cleaning}
+# create averages of repeated columns
+```
+
+```{r data_cleaning}
+# turn participate code into new ID number
+# create diagnosis column (HC = healthy, RBD = REM sleep disorder, PD = PD)
+```
+
+```{r data_cleaning}
+# Rename columns
 ```
 
 ## Exploratory Data Analysis
