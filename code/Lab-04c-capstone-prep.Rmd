@@ -100,7 +100,7 @@ parkinsons_dataset$Gender <- parkinsons_dataset$Gender %>%
 parkinsons_dataset[[13]] <- parkinsons_dataset[[13]] %>%
   factor(levels = c("1", "1.5", "2", "2.5", "3", "3.5", "4", "4.5", "5"))
 
-parkinsons_dataset[,17:36] <- parkinsons_dataset[17:36] %>% 
+parkinsons_dataset[,15:41] <- parkinsons_dataset[15:41] %>% 
   lapply(factor, levels = 0:4)
 
 # rename all variables
