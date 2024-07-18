@@ -75,14 +75,17 @@ parkinsons_dataset <- parkinsons_dataset %>%
   )
 
 # turn columns into factors
-parkinsons_dataset$gender <- parkinsons_dataset$gender %>%
+parkinsons_dataset$Gender <- parkinsons_dataset$Gender %>%
   as.factor()
 
 parkinsons_dataset[[13]] <- parkinsons_dataset[[13]] %>%
   factor(levels = c("1", "1.5", "2", "2.5", "3", "3.5", "4", "4.5", "5"))
 
-parkinsons_dataset[,17:36] <- parkinsons_dataset[17:36] %>% 
+parkinsons_dataset[,15:41] <- parkinsons_dataset[,15:41] %>% 
   lapply(factor, levels = 0:4)
+
+parkinsons_dataset[, c(5, 6, 14)] <- parkinsons_dataset[, c(5, 6, 14)] %>% 
+  lapply(as.numeric)
 
 #renaming variables DONE
 parkinsons_dataset <- parkinsons_dataset %>% rename(id = `Participant  code`, age = `Age  (years)`, gender = Gender, fam_history = `Positive  history  of  Parkinson  disease  in  family`, age_onset = `Age  of  disease  onset  (years)`, duration = `Duration  of  disease  from  first  symptoms  (years)`)
@@ -105,6 +108,8 @@ glimpse(parkinsons_dataset)
 ```{r data_cleaning}
 # turn participate code into new ID number
 # create diagnosis column (HC = healthy, RBD = REM sleep disorder, PD = PD)
+glimpse(parkinsons_dataset)
+
 
 
 ```
