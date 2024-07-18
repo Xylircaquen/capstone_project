@@ -88,8 +88,7 @@ parkinsons_dataset <- parkinsons_dataset %>%
         TRUE ~ .
       )
     )
-  ) %>% 
-  drop_na()
+  )
 ```
 
 ## Exploratory Data Analysis
