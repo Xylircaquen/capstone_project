@@ -1,6 +1,6 @@
 ---
-title: "Lab-04c-capstone-prep"
-author: "Peyton Politewicz"
+title: "Capstone-Project-PD"
+author: "Emma, Jasmine, Leila, Madeline"
 date: "2024-07-10"
 output: html_document
 ---
@@ -13,21 +13,9 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Introduction
 
-A lot of the mechanics behind data science work is messy, but today we're going to do our best to get started on the right foot and sidestep some of that! This document is going to help you get situated when you start working on your capstone project. There are many approaches to an open-ended problem like a research project, and this is just one of them; as you learn what you like and don't like about R and R markdown, about how to structure your work, feel free to change things. Burn it all down and start again, if you choose!
-
-This is just one example of what good might look like.
-
 ## Research Question(s)
 
-**Always** start with this - you need to know where your work is headed to help guide all of your analysis.
-
-In the case of this project, and quite often in research, you're going to be given a dataset and you might not have an explicit objective given to you.
-
-Start with an open mind - recall exploratory data analysis. You've got a totally blank slate, so your first task might be to find out what's interesting about a dataset that begets further investigation.
-
 ## Initialization
-
-We're going to start building our toolbox by adding our functions. Whenever we want to use a new tool, we're going to come back up here and add it into this code block.
 
 ```{r initialization}
 #
@@ -42,13 +30,6 @@ set.seed(0)
 ```
 
 ## Data Import
-
-Typically, I split this section into two pieces; one explicitly for imports and merging,     and another explicitly for data cleaning operations.
-
-**An important note** is filtering and trimming your dataset down is different than cleaning; this first section is about getting your data into a 'minimum usable state', renaming things, removing records that are erroneous or full of 'NA' or 'NULL' values, and so forth. I, personally, wouldn't start filtering, subetting, or other such tasks until I was writing code that dealt with those subsets.
-
-**Another important note** is that you should take notes in comments (lines beginning with #) to keep track of what occurs here - it's typically requested when you author research papers to note how many observations were removed, and for what reasons.
-
 ```{r data_import}
 #
 #read_csv()...
@@ -94,7 +75,7 @@ parkinsons_dataset <- parkinsons_dataset %>%
   )
 
 # turn columns into factors
-parkinsons_dataset$Gender <- parkinsons_dataset$Gender %>%
+parkinsons_dataset$gender <- parkinsons_dataset$gender %>%
   as.factor()
 
 parkinsons_dataset[[13]] <- parkinsons_dataset[[13]] %>%
@@ -103,6 +84,7 @@ parkinsons_dataset[[13]] <- parkinsons_dataset[[13]] %>%
 parkinsons_dataset[,17:36] <- parkinsons_dataset[17:36] %>% 
   lapply(factor, levels = 0:4)
 
+#renaming variables
 parkinsons_dataset <- parkinsons_dataset %>% rename(id = `Participant  code`, age = `Age  (years)`, gender = Gender, fam_history = `Positive  history  of  Parkinson  disease  in  family`, age_onset = `Age  of  disease  onset  (years)`, duration = `Duration  of  disease  from  first  symptoms  (years)`)
 
 parkinsons_dataset <- parkinsons_dataset %>% rename(antidep_meds = `Antidepressant  therapy`, antipark_meds = `Antiparkinsonian  medication`, antipsych_meds = `Antipsychotic  medication`, benz_meds = `Benzodiazepine  medication`, ldopa = `Levodopa  equivalent  (mg/day)`, clonaz = `Clonazepam  (mg/day)`, hoen_yahr_motor = `Overview  of  motor  examination:  Hoehn  &  Yahr  scale  (-)`, updrs = `Overview  of  motor  examination:  UPDRS  III  total  (-)`, speech = `18.  Speech`, facial = `19.  Facial  Expression`, tremorRest_head = `20.  Tremor  at  Rest  -  head`, tremorRest_RUE = `20.  Tremor  at  Rest  -  RUE`, tremorRest_LUE = `20.  Tremor  at  Rest  -  LUE`, tremorRest_RLE = `20.  Tremor  at  Rest  -  RLE`, tremorRest_LLE = `20.  Tremor  at  Rest  -  LLE`, AP_tremor_RUE = `21.  Action  or  Postural  Tremor  -  RUE`, AP_tremor_LUE = `21.  Action  or  Postural  Tremor  -  LUE`, rigid_neck = `22.  Rigidity  -  neck`, rigid_RUE = `22.  Rigidity  -  RUE`, rigid_LUE = `22.  Rigidity  -  LUE`, rigid_RLE = `22.  Rigidity  -  RLE`, rigid_LLE = `22.  Rigidity  -  LLE`)
@@ -112,44 +94,20 @@ parkinsons_dataset <- parkinsons_dataset %>% rename(fingertaps_RUE = `23.Finger 
 parkinsons_dataset <- parkinsons_dataset %>% rename(entropy1 = `Entropy  of  speech  timing  (-)...42`, rate_speech_time1 = `Rate  of  speech  timing  (-/min)...43`, accel_speech_time1 = `Acceleration  of  speech  timing  (-/min2)...44`, dur_pause_int1 = `Duration  of  pause  intervals  (ms)...45`, dur_voice_int1 = `Duration  of  voiced  intervals  (ms)...46`, gap_voiced_int1 = `Gaping  in-between  voiced  intervals  (-/min)`, dur_unvoiced_stops1 = `Duration  of  unvoiced  stops  (ms)...48`, decay_fric1 = `Decay  of  unvoiced  fricatives  (‰/min)...49`, rel_loud_resp1 = `Relative  loudness  of  respiration  (dB)...50`, pause_int_resp1 = `Pause  intervals  per  respiration  (-)...51`, rate_speech_resp1 = `Rate  of  speech  respiration  (-/min)...52`, latency_resp1 = `Latency  of  respiratory  exchange  (ms)...53`)
 
 parkinsons_dataset <- parkinsons_dataset %>% rename(entropy2 = `Entropy  of  speech  timing  (-)...54`, rate_speech_time2 = `Rate  of  speech  timing  (-/min)...55`, accel_speech_time2 = `Acceleration  of  speech  timing  (-/min2)...56`, dur_pause_int2 = `Duration  of  pause  intervals  (ms)...57`, dur_voice_int2 = `Duration  of  voiced  intervals  (ms)...58`, gap_voiced_int2 = `Gaping  in-between  voiced  Intervals  (-/min)`, dur_unvoiced_stops2 = `Duration  of  unvoiced  stops  (ms)...60`, decay_fric2 = `Decay  of  unvoiced  fricatives  (‰/min)...61`, rel_loud_resp2 = `Relative  loudness  of  respiration  (dB)...62`, pause_int_resp2 = `Pause  intervals  per  respiration  (-)...63`, rate_speech_resp2 = `Rate  of  speech  respiration  (-/min)...64`, latency_resp2 = `Latency  of  respiratory  exchange  (ms)...65`)
+
 ```
 
 ```{r data_cleaning}
 # turn participate code into new ID number
 # create diagnosis column (HC = healthy, RBD = REM sleep disorder, PD = PD)
 
+
 ```
 
 ## Exploratory Data Analysis
 
-Here's where the majority of your coding effort will likely take place. In doing EDA, you're going to be slicing, filtering, subsetting, and transforming your data. Break this into subsections with specific goals, and make sure to *save* your figures to the folder with appropriate names!
-
-It's hard for me to prescribe what exactly to do here, because where you go varies dataset by dataset, and objective by objective.
-
-Consider some things, if you don't have an explicit goal for your project yet. Are there extant differences between subpopulations in your sample? Are there specific features you want to examine for trends?
-
-Include appropriate comments and notes as you go. This is largely a scratchpad, where things don't necessarily have to be presentable or pretty (yet). This is just a space for you and your team to throw ideas together - check parameters, test things out, and prepare your data for modeling or more 'final' tests.
-
-Make sure to document the driving idea behind each thread of thought; including a sentence or two in a comment to track what you were doing can make it easy for others to follow up on your work, and make it easier for you to come back to an old idea in case you're jumping between tasks (this will happen - frequently! get in the habit of leaving breadcrumbs!)
-
 ## Models and Statistical Tests
-
-Once your data is in a workable state, here is where you'll run regressions and comparative tests to generate results to test the statistical questions you landed on after performing exploratory data analysis.
-
-Operate with the same diligence as before - separate chunks for separate tasks. Annotate everything. 
 
 ## Results
 
-Your results can typically be summarized with a set of **four** values, recall:
-An estimated value - what it says on the tin!
-A p-value is a result's statistical significance -  (lower is better - the chance that your result would have occurred under pure random chance)
-A confidence interval - (a range in which we're some percentage [typically 95 or 99%] sure the value can take)
-An r-squared value - (how much of the data's total variance is explained by the model - you'll see this early next week!)
-
-Save this section for extracting relevant results from the models and statistical test objects you generate above. Transform, present, and display them as necessary.
-
 ## Conclusions
-
-This final part is almost all written; do your findings validate your research question? Are they significant? Are they significant *and* impactful? Are they significant, impactful, *and* precise? Two out of three?
-
-Think about and talk about the implications of what you've discovered.
