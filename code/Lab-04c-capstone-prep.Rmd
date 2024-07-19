@@ -151,7 +151,13 @@ Make sure to document the driving idea behind each thread of thought; including 
 
 ```{r}
 # data exploration code here:
+parkinsons_dataset %>% 
+  ggplot(aes(x = age, y = duration, color = diagnosis)) +
+  geom_point()
 
+parkinsons_dataset %>% 
+  ggplot(aes(x = speech, y = facial, color = diagnosis)) +
+  geom_jitter()
 ```
 
 
