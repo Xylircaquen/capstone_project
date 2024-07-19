@@ -152,34 +152,41 @@ Make sure to document the driving idea behind each thread of thought; including 
 
 ```{r}
 # data exploration code here:
+
+# no association between age and duration of disease
 parkinsons_dataset %>% 
   ggplot(aes(x = age, y = duration, color = diagnosis)) +
   geom_point()
 
+# people with PD have more severe speech and facial problems
 parkinsons_dataset %>% 
   drop_na(speech, facial) %>% 
   ggplot(aes(x = speech, y = facial, color = diagnosis)) +
   geom_jitter()
 
+# there are not enough people with a family history of PD to prove a relationship
 parkinsons_dataset %>% 
   drop_na(fam_history) %>% 
   ggplot(aes(x = fam_history, y = age_onset)) +
   geom_boxplot()
 
+# matrix plot of tremor at rest
 parkinsons_dataset[,c(2, 18:22)] %>% 
   drop_na() %>% 
   ggpairs(aes(color = diagnosis))
 
+# matrix plot of posture, gait, postural stability, bradykinesia and hypokinesia
 parkinsons_dataset[,c(2, 39:42)] %>% 
   drop_na() %>% 
   ggpairs(aes(color = diagnosis))
 
+# there are more people with PD that don't have good postural stability
+# there is one person with RBD that has worse post stability than everyone else (outlier?)
 parkinsons_dataset %>% 
   drop_na(post_stability) %>% 
   ggplot(aes(x = post_stability, y = diagnosis, color = diagnosis)) +
   geom_jitter()
 ```
-
 
 ## Models and Statistical Tests
 
