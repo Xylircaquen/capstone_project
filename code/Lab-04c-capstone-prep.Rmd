@@ -196,7 +196,7 @@ Operate with the same diligence as before - separate chunks for separate tasks. 
 
 ```{r}
 # is there a correlation between diagnosis, age, age onset and updrs: no?
-logistic_model_1 <- parkinsons_dataset %>% 
+logistic_model_1 <- parkinsons_dataset[1:80,] %>% 
   glm(diagnosis ~ age + age_onset + updrs, family = binomial, data = .)
 summary(logistic_model_1)
 logistic_model_1 %>% 
