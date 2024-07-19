@@ -37,6 +37,7 @@ We're going to start building our toolbox by adding our functions. Whenever we w
 #
 
 library(tidyverse)
+library(GGally)
 
 set.seed(0)
 ```
@@ -156,7 +157,26 @@ parkinsons_dataset %>%
   geom_point()
 
 parkinsons_dataset %>% 
+  drop_na(speech, facial) %>% 
   ggplot(aes(x = speech, y = facial, color = diagnosis)) +
+  geom_jitter()
+
+parkinsons_dataset %>% 
+  drop_na(fam_history) %>% 
+  ggplot(aes(x = fam_history, y = age_onset)) +
+  geom_boxplot()
+
+parkinsons_dataset[,c(2, 18:22)] %>% 
+  drop_na() %>% 
+  ggpairs(aes(color = diagnosis))
+
+parkinsons_dataset[,c(2, 39:42)] %>% 
+  drop_na() %>% 
+  ggpairs(aes(color = diagnosis))
+
+parkinsons_dataset %>% 
+  drop_na(post_stability) %>% 
+  ggplot(aes(x = post_stability, y = diagnosis, color = diagnosis)) +
   geom_jitter()
 ```
 
