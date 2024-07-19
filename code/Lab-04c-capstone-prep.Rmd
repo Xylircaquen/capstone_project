@@ -38,6 +38,8 @@ We're going to start building our toolbox by adding our functions. Whenever we w
 
 library(tidyverse)
 library(GGally)
+library(gtsummary)
+library(rsample)
 
 set.seed(0)
 ```
@@ -151,8 +153,6 @@ Include appropriate comments and notes as you go. This is largely a scratchpad, 
 Make sure to document the driving idea behind each thread of thought; including a sentence or two in a comment to track what you were doing can make it easy for others to follow up on your work, and make it easier for you to come back to an old idea in case you're jumping between tasks (this will happen - frequently! get in the habit of leaving breadcrumbs!)
 
 ```{r}
-# data exploration code here:
-
 # no association between age and duration of disease
 parkinsons_dataset %>% 
   ggplot(aes(x = age, y = duration, color = diagnosis)) +
@@ -192,7 +192,35 @@ parkinsons_dataset %>%
 
 Once your data is in a workable state, here is where you'll run regressions and comparative tests to generate results to test the statistical questions you landed on after performing exploratory data analysis.
 
-Operate with the same diligence as before - separate chunks for separate tasks. Annotate everything. 
+Operate with the same diligence as before - separate chunks for separate tasks. Annotate everything.
+
+```{r}
+# is there a correlation between diagnosis, age, age onset and updrs: no?
+logistic_model_1 <- parkinsons_dataset %>% 
+  glm(diagnosis ~ age + age_onset + updrs, family = binomial, data = .)
+summary(logistic_model_1)
+logistic_model_1 %>% 
+  tbl_regression(estimate_fun = function(x) style_number(x, digits = 3), exponentiate = TRUE)
+
+data_split <- parkinsons_dataset %>% 
+  drop_na(age_onset) %>% 
+  initial_split(prop = 0.7) 
+train_data <- training(data_split)
+test_data <- testing(data_split)
+
+pred_prob <- logistic_model_1 %>% 
+  predict(test_data, type = "response")
+predicted.classes <- ifelse(pred_prob > 0.5, "1", "0")
+mean(predicted.classes == test_data$diagnosis)
+# result: 0 :(
+
+# is there a correlation between updrs, age, age onset and diagnosis: no?
+logistic_model_2 <- parkinsons_dataset %>% 
+  glm(diagnosis ~ age + duration + updrs, family = binomial, data = .)
+summary(logistic_model_2)
+logistic_model_2 %>% 
+  tbl_regression(estimate_fun = function(x) style_number(x, digits = 3), exponentiate = TRUE)
+```
 
 ## Results
 
