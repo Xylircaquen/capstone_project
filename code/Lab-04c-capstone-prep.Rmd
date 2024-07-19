@@ -100,16 +100,21 @@ parkinsons_dataset <- parkinsons_dataset %>% rename(entropy2 = `Entropy  of  spe
 
 ```
 ```{r}
+
+```
+```{r}
 # EDA fun
-glimpse(parkinsons_dataset)
+library(ggplot2)
 ```
 
 
 ```{r data_cleaning}
 # turn participate code into new ID number
 # create diagnosis column (HC = healthy, RBD = REM sleep disorder, PD = PD)
+library(tidyverse)
 glimpse(parkinsons_dataset)
-
+ggplot(parkinsons_dataset, aes(x = facial, y = speech)) + 
+         geom_point()
 
 
 ```
