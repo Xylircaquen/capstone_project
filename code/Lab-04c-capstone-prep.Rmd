@@ -188,6 +188,24 @@ parkinsons_dataset %>%
   geom_jitter()
 ```
 
+```{r}
+parkinsons_dataset %>% 
+  ggplot(aes(x = id, y = dur_unvoiced_stops2)) +
+  geom_boxplot(aes(color = diagnosis)) +
+  geom_point(aes(shape = diagnosis))
+
+parkinsons_dataset %>% 
+  ggplot(aes(x = id, y = decay_fric2)) +
+  geom_boxplot(aes(color = diagnosis)) +
+  geom_point(aes(shape = diagnosis))
+
+parkinsons_dataset %>% 
+  ggplot(aes(x = id, y = rel_loud_resp2)) +
+  geom_boxplot(aes(color = diagnosis)) +
+  geom_point(aes(shape = diagnosis))
+```
+
+
 ## Models and Statistical Tests
 
 Once your data is in a workable state, here is where you'll run regressions and comparative tests to generate results to test the statistical questions you landed on after performing exploratory data analysis.
