@@ -140,6 +140,21 @@ parkinsons_dataset <- parkinsons_dataset %>%
   select(id, diagnosis, everything())
 ```
 
+```{r}
+parkinsons_dataset <- parkinsons_dataset %>% 
+  mutate(
+    pd = case_when(
+      diagnosis == "PD" ~ TRUE,
+      TRUE ~ FALSE
+    ),
+    rbd = case_when(
+      diagnosis == "RBD" ~ TRUE,
+      TRUE ~ FALSE
+    )
+  ) %>% 
+  select(id, diagnosis, pd, rbd, everything())
+```
+
 ## Exploratory Data Analysis
 
 Here's where the majority of your coding effort will likely take place. In doing EDA, you're going to be slicing, filtering, subsetting, and transforming your data. Break this into subsections with specific goals, and make sure to *save* your figures to the folder with appropriate names!
@@ -189,13 +204,29 @@ parkinsons_dataset %>%
 ```
 
 ```{r}
+# voice variables eda
+parkinsons_dataset %>% 
+  ggplot(aes(x = id, y = dur_unvoiced_stops1)) +
+  geom_boxplot(aes(color = diagnosis)) +
+  geom_point(aes(shape = diagnosis))
+
 parkinsons_dataset %>% 
   ggplot(aes(x = id, y = dur_unvoiced_stops2)) +
   geom_boxplot(aes(color = diagnosis)) +
   geom_point(aes(shape = diagnosis))
 
 parkinsons_dataset %>% 
+  ggplot(aes(x = id, y = decay_fric1)) +
+  geom_boxplot(aes(color = diagnosis)) +
+  geom_point(aes(shape = diagnosis))
+
+parkinsons_dataset %>% 
   ggplot(aes(x = id, y = decay_fric2)) +
+  geom_boxplot(aes(color = diagnosis)) +
+  geom_point(aes(shape = diagnosis))
+
+parkinsons_dataset %>% 
+  ggplot(aes(x = id, y = rel_loud_resp1)) +
   geom_boxplot(aes(color = diagnosis)) +
   geom_point(aes(shape = diagnosis))
 
@@ -238,6 +269,22 @@ logistic_model_2 <- parkinsons_dataset %>%
 summary(logistic_model_2)
 logistic_model_2 %>% 
   tbl_regression(estimate_fun = function(x) style_number(x, digits = 3), exponentiate = TRUE)
+```
+
+```{r}
+# voice variable tests
+
+logistic_model_voice1 <- parkinsons_dataset %>% 
+  glm(diagnosis ~ dur_unvoiced_stops1 + dur_unvoiced_stops2, family = binomial, data = .)
+summary(logistic_model_voice1)
+
+logistic_model_voice2 <- parkinsons_dataset %>% 
+  glm(diagnosis ~ decay_fric1 + decay_fric2, family = binomial, data = .)
+summary(logistic_model_voice2)
+
+logistic_model_voice3 <- parkinsons_dataset %>% 
+  glm(diagnosis ~ rel_loud_resp1 + rel_loud_resp2, family = binomial, data = .)
+summary(logistic_model_voice3)
 ```
 
 ## Results
