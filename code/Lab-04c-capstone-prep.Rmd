@@ -135,6 +135,20 @@ parkinsons_dataset$diagnosis <- parkinsons_dataset$diagnosis %>%
 
 parkinsons_dataset <- parkinsons_dataset %>% 
   select(id, diagnosis, everything())
+
+# new data wrangling stuff
+parkinsons_dataset <- parkinsons_dataset %>% 
+  mutate(
+    pd = case_when(
+      diagnosis == "PD" ~ TRUE,
+      TRUE ~ FALSE
+    ),
+    rbd = case_when(
+      diagnosis == "RBD" ~ TRUE,
+      TRUE ~ FALSE
+    )
+  ) %>% 
+  select(id, diagnosis, pd, rbd, everything())
 ```
 
 ## Exploratory Data Analysis
