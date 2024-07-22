@@ -139,8 +139,23 @@ parkinsons_dataset$diagnosis <- parkinsons_dataset$diagnosis %>%
 parkinsons_dataset <- parkinsons_dataset %>% 
   select(id, diagnosis, everything())
 
+# new data wrangling stuff
+parkinsons_dataset <- parkinsons_dataset %>% 
+  mutate(
+    pd = case_when(
+      diagnosis == "PD" ~ TRUE,
+      TRUE ~ FALSE
+    ),
+    rbd = case_when(
+      diagnosis == "RBD" ~ TRUE,
+      TRUE ~ FALSE
+    )
+  ) %>% 
+  select(id, diagnosis, pd, rbd, everything())
+
 colnames (parkinsons_dataset)
 ```
+
 
 ## Exploratory Data Analysis
 
@@ -156,6 +171,8 @@ Make sure to document the driving idea behind each thread of thought; including 
 
 ```{r}
 # data exploration code here:
+
+# a bunch of random graphs:
 ggplot(data = parkinsons_dataset,
        aes(x = age, y = speech )) +
   geom_boxplot() +
@@ -246,6 +263,7 @@ theme_bw()
 
 
 ```{r}
+#more graphs
 attach(parkinsons_dataset)
 plot(diagnosis,rigid_neck, main="Scatterplot of diagnosis neck rigidity")
 plot(diagnosis,rigid_RUE, main="Scatterplot of diagnosis RUE rigidity")
@@ -262,21 +280,27 @@ plot(diagnosis,rapidAltMove_RUE, main="Scatterplot of diagnosis rapidAltMove_RUE
 plot(diagnosis,rapidAltMove_LUE, main="Scatterplot of diagnosis rapidAltMove_LUE")
 plot(diagnosis,legAg_RLE, main="Scatterplot of diagnosis legAg_RLE")
 plot(diagnosis,legAG_LLE, main="Scatterplot of diagnosis legAG_LLE")
+
+plot(pd,dur_pause_int1, main="Scatterplot of diagnosis and dur_pause_int1")
+plot(pd,dur_voice_int1, main="Scatterplot of diagnosis and dur_voice_int1")
+plot(pd,gap_voiced_int1, main="Scatterplot of diagnosis and gap_voiced_int1")
+plot(pd,dur_pause_int2, main="Scatterplot of diagnosis and dur_pause_int2")
+plot(pd,dur_voice_int2, main="Scatterplot of diagnosis and dur_voice_int2")
+plot(pd,gap_voiced_int2, main="Scatterplot of diagnosis and gap_voiced_int2")
 ```
+
 ```{r}
+#t-tests and p-values maybe?
 summary(parkinsons_dataset)
 
 lm(age_onset ~ diagnosis + entropy1 + entropy2 + posture + gait + post_stability + brady_hypo + chair, data = parkinsons_dataset) %>%
   tbl_regression(estimate_fun = function(x) style_number(x, digits = 3))
 
-
 lm(age_onset ~ diagnosis + rate_speech_time1 + accel_speech_time1 + dur_pause_int1 + dur_voice_int1 + gap_voiced_int1 + dur_unvoiced_stops1 + decay_fric1 + rel_loud_resp1 + pause_int_resp1 + rate_speech_resp1 + latency_resp1, data = parkinsons_dataset) %>%
   tbl_regression(estimate_fun = function(x) style_number(x, digits = 3))
 
-
 lm(age_onset ~ diagnosis + rate_speech_time2 + accel_speech_time2 + dur_pause_int2 + dur_voice_int2 + gap_voiced_int2 + dur_unvoiced_stops2 + decay_fric2 + rel_loud_resp2 + pause_int_resp2 + rate_speech_resp2 + latency_resp2, data = parkinsons_dataset) %>%
   tbl_regression(estimate_fun = function(x) style_number(x, digits = 3))
-
 
 
 pd_model <- lm(age_onset ~ diagnosis + brady_hypo + entropy1 + entropy2, data = parkinsons_dataset)
@@ -284,14 +308,15 @@ summary(pd_model)
 
 pd_model <- lm(age_onset ~ diagnosis + chair + posture + gait + post_stability, data = parkinsons_dataset)
 summary(pd_model)
+
 #***
 pd_model <- lm(age_onset ~ age + duration, data = parkinsons_dataset)
 summary(pd_model) 
 
 pd_model <- lm(duration ~ tremorRest_head + tremorRest_RUE + tremorRest_LUE+tremorRest_RLE+tremorRest_LLE+AP_tremor_RUE+AP_tremor_LUE+rigid_neck+rigid_RUE+rigid_LUE+rigid_RLE+rigid_LLE+fingertaps_RUE+fingertaps_LUE+handmove_RUE+handmove_LUE+rapidAltMove_RUE+rapidAltMove_LUE+legAg_RLE+legAG_LLE + rate_speech_time1 + accel_speech_time1 + dur_pause_int1 + dur_voice_int1 + gap_voiced_int1 + dur_unvoiced_stops1 + decay_fric1 + rel_loud_resp1 + pause_int_resp1 + rate_speech_resp1 + latency_resp1 + rate_speech_time2 + accel_speech_time2 + dur_pause_int2 + dur_voice_int2 + gap_voiced_int2 + dur_unvoiced_stops2 + decay_fric2 + rel_loud_resp2 + pause_int_resp2 + rate_speech_resp2 + latency_resp2, data = parkinsons_dataset)
 summary(pd_model) 
-```
-```{r}
+
+
 glm(formula = diagnosis ~ age, family = binomial,
     data = parkinsons_dataset)
 
