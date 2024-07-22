@@ -37,6 +37,9 @@ We're going to start building our toolbox by adding our functions. Whenever we w
 #
 
 library(tidyverse)
+library(ggplot2)
+library(ggthemes)
+library(gtsummary)
 
 set.seed(0)
 ```
@@ -49,7 +52,7 @@ Typically, I split this section into two pieces; one explicitly for imports and 
 
 **Another important note** is that you should take notes in comments (lines beginning with #) to keep track of what occurs here - it's typically requested when you author research papers to note how many observations were removed, and for what reasons.
 
-```{r dataImport}
+```{r data_import}
 #
 #read_csv()...
 #data <- left_join(data, otherdata, by = matchingFeature)
@@ -58,27 +61,8 @@ Typically, I split this section into two pieces; one explicitly for imports and 
 parkinsons_dataset <- read_csv("../data/dataset.csv")
 ```
 
-
-```{r dataCleaning}
-# turn yes and no into logicals
-parkinsons_dataset <- parkinsons_dataset %>% 
-  mutate(
-    across(
-      c(4, 7:10
-      ),
-      ~ case_when(
-        . == "No" ~ FALSE,
-        . == "-" ~ NA,
-        TRUE ~ TRUE
-      )
-    )
-  )
-
-# turn everything that should be a factor into a factor (find out which ones other than gender)
-parkinsons_dataset <- parkinsons_dataset %>%
-  mutate(Gender = as.factor(Gender))
-
-#drop.na()...
+```{r data_cleaning}
+# turn all - into NA DONE
 parkinsons_dataset <- parkinsons_dataset %>% 
   mutate(
     across(
@@ -89,6 +73,73 @@ parkinsons_dataset <- parkinsons_dataset %>%
       )
     )
   )
+
+# turn yes and no into logicals DONE
+parkinsons_dataset <- parkinsons_dataset %>% 
+  mutate(
+    across(4,
+      ~ case_when(
+        . == "Yes" ~ TRUE,
+        . == "No" ~ FALSE
+      )
+    )
+  )
+
+# turn yes and no for medication into medication name or none DONE
+parkinsons_dataset <- parkinsons_dataset %>% 
+  mutate(
+    across(7:10,
+      ~ case_when(
+        substr(., 1, 3) == "Yes" ~ substr(., 7, nchar(.) - 1),
+        . == "No" ~ "None"
+      )
+    )
+  )
+
+# turn columns into factors
+parkinsons_dataset$Gender <- parkinsons_dataset$Gender %>%
+  as.factor()
+
+parkinsons_dataset[[13]] <- parkinsons_dataset[[13]] %>%
+  factor(levels = c("1", "1.5", "2", "2.5", "3", "3.5", "4", "4.5", "5"))
+
+parkinsons_dataset[, 15:41] <- parkinsons_dataset[, 15:41] %>% 
+  lapply(factor, levels = 0:4)
+
+parkinsons_dataset[, c(5, 6, 14)] <- parkinsons_dataset[, c(5, 6, 14)] %>% 
+  lapply(as.numeric)
+
+# rename all variables
+parkinsons_dataset <- parkinsons_dataset %>% 
+  rename(id = `Participant  code`, age = `Age  (years)`, gender = Gender, fam_history = `Positive  history  of  Parkinson  disease  in  family`, age_onset = `Age  of  disease  onset  (years)`, duration = `Duration  of  disease  from  first  symptoms  (years)`)
+
+parkinsons_dataset <- parkinsons_dataset %>% 
+  rename(antidep_meds = `Antidepressant  therapy`, antipark_meds = `Antiparkinsonian  medication`, antipsych_meds = `Antipsychotic  medication`, benz_meds = `Benzodiazepine  medication`, ldopa = `Levodopa  equivalent  (mg/day)`, clonaz = `Clonazepam  (mg/day)`, hoen_yahr_motor = `Overview  of  motor  examination:  Hoehn  &  Yahr  scale  (-)`, updrs = `Overview  of  motor  examination:  UPDRS  III  total  (-)`, speech = `18.  Speech`, facial = `19.  Facial  Expression`, tremorRest_head = `20.  Tremor  at  Rest  -  head`, tremorRest_RUE = `20.  Tremor  at  Rest  -  RUE`, tremorRest_LUE = `20.  Tremor  at  Rest  -  LUE`, tremorRest_RLE = `20.  Tremor  at  Rest  -  RLE`, tremorRest_LLE = `20.  Tremor  at  Rest  -  LLE`, AP_tremor_RUE = `21.  Action  or  Postural  Tremor  -  RUE`, AP_tremor_LUE = `21.  Action  or  Postural  Tremor  -  LUE`, rigid_neck = `22.  Rigidity  -  neck`, rigid_RUE = `22.  Rigidity  -  RUE`, rigid_LUE = `22.  Rigidity  -  LUE`, rigid_RLE = `22.  Rigidity  -  RLE`, rigid_LLE = `22.  Rigidity  -  LLE`)
+
+parkinsons_dataset <- parkinsons_dataset %>% 
+  rename(fingertaps_RUE = `23.Finger  Taps  -  RUE`, fingertaps_LUE = `23.Finger  Taps  -  LUE`, handmove_RUE = `24.  Hand  Movements  -  RUE`, handmove_LUE = `24.  Hand  Movements  -  LUE`, rapidAltMove_RUE = `25.  Rapid  Alternating  Movements  -  RUE`, rapidAltMove_LUE = `25.  Rapid  Alternating  Movements  -  LUE`, legAg_RLE = `26.  Leg  Agility  -  RLE`, legAG_LLE = `26.  Leg  Agility  -  LLE`, chair = `27.  Arising  from  Chair`, posture = `28.  Posture`, gait = `29.  Gait`, post_stability = `30.  Postural  Stability`, brady_hypo = `31.  Body  Bradykinesia  and  Hypokinesia`)
+
+parkinsons_dataset <- parkinsons_dataset %>% 
+  rename(entropy1 = `Entropy  of  speech  timing  (-)...42`, rate_speech_time1 = `Rate  of  speech  timing  (-/min)...43`, accel_speech_time1 = `Acceleration  of  speech  timing  (-/min2)...44`, dur_pause_int1 = `Duration  of  pause  intervals  (ms)...45`, dur_voice_int1 = `Duration  of  voiced  intervals  (ms)...46`, gap_voiced_int1 = `Gaping  in-between  voiced  intervals  (-/min)`, dur_unvoiced_stops1 = `Duration  of  unvoiced  stops  (ms)...48`, decay_fric1 = `Decay  of  unvoiced  fricatives  (‰/min)...49`, rel_loud_resp1 = `Relative  loudness  of  respiration  (dB)...50`, pause_int_resp1 = `Pause  intervals  per  respiration  (-)...51`, rate_speech_resp1 = `Rate  of  speech  respiration  (-/min)...52`, latency_resp1 = `Latency  of  respiratory  exchange  (ms)...53`)
+
+parkinsons_dataset <- parkinsons_dataset %>% 
+  rename(entropy2 = `Entropy  of  speech  timing  (-)...54`, rate_speech_time2 = `Rate  of  speech  timing  (-/min)...55`, accel_speech_time2 = `Acceleration  of  speech  timing  (-/min2)...56`, dur_pause_int2 = `Duration  of  pause  intervals  (ms)...57`, dur_voice_int2 = `Duration  of  voiced  intervals  (ms)...58`, gap_voiced_int2 = `Gaping  in-between  voiced  Intervals  (-/min)`, dur_unvoiced_stops2 = `Duration  of  unvoiced  stops  (ms)...60`, decay_fric2 = `Decay  of  unvoiced  fricatives  (‰/min)...61`, rel_loud_resp2 = `Relative  loudness  of  respiration  (dB)...62`, pause_int_resp2 = `Pause  intervals  per  respiration  (-)...63`, rate_speech_resp2 = `Rate  of  speech  respiration  (-/min)...64`, latency_resp2 = `Latency  of  respiratory  exchange  (ms)...65`)
+
+# turn participate code into new ID number
+# create diagnosis column (HC = healthy, RBD = REM sleep disorder, PD = PD)
+parkinsons_dataset <- parkinsons_dataset %>% 
+  mutate(
+    diagnosis = substr(id, 1, nchar(id) - 2),
+    id = row_number()
+  )
+
+parkinsons_dataset$diagnosis <- parkinsons_dataset$diagnosis %>% 
+  as.factor()
+
+parkinsons_dataset <- parkinsons_dataset %>% 
+  select(id, diagnosis, everything())
+
+colnames (parkinsons_dataset)
 ```
 
 ## Exploratory Data Analysis
@@ -102,6 +153,152 @@ Consider some things, if you don't have an explicit goal for your project yet. A
 Include appropriate comments and notes as you go. This is largely a scratchpad, where things don't necessarily have to be presentable or pretty (yet). This is just a space for you and your team to throw ideas together - check parameters, test things out, and prepare your data for modeling or more 'final' tests.
 
 Make sure to document the driving idea behind each thread of thought; including a sentence or two in a comment to track what you were doing can make it easy for others to follow up on your work, and make it easier for you to come back to an old idea in case you're jumping between tasks (this will happen - frequently! get in the habit of leaving breadcrumbs!)
+
+```{r}
+# data exploration code here:
+ggplot(data = parkinsons_dataset,
+       aes(x = age, y = speech )) +
+  geom_boxplot() +
+  theme_bw ()
+
+parkinsons_dataset %>% 
+  drop_na(tremorRest_head) %>% 
+       aes(x = fam_history) +
+  geom_bar() +
+  theme_bw ()
+
+ggplot(data = parkinsons_dataset,
+       aes(x = age_onset)) +
+  geom_histogram(binwidth = 1, fill = "slategrey") +
+  theme_bw ()
+
+ggplot(data = parkinsons_dataset,
+       aes(x = updrs, y = diagnosis)) +
+  geom_boxplot(fill = "slategrey") +
+  theme_bw ()
+
+ggplot(data = parkinsons_dataset,
+       aes(x = age, y = posture)) +
+  geom_boxplot(fill = "slategrey") +
+  theme_bw ()
+
+ggplot(data = parkinsons_dataset,
+       aes(x = age, color = post_stability)) +
+  geom_histogram(fill = "white") +
+  theme_bw ()
+
+ggplot(parkinsons_dataset,
+       aes(x = age_onset,
+           y = duration,
+           color = benz_meds)) +
+  geom_point() +
+theme_bw()
+
+ggplot(parkinsons_dataset,
+       aes(x = age_onset,
+           y = duration,
+           color = clonaz)) +
+  geom_point() +
+theme_bw()
+
+ggplot(parkinsons_dataset, 
+       aes(diagnosis, age, colour = facial)) + 
+  geom_jitter() + 
+theme_bw()
+
+parkinsons_dataset %>% 
+  drop_na(tremorRest_head) %>% 
+  ggplot(aes(x = diagnosis, y = age, color = tremorRest_head)) + 
+geom_jitter(stat = "identity", fill = "maroon4")
+
+parkinsons_dataset %>% 
+  drop_na(tremorRest_head) %>% 
+  ggplot(aes(x = diagnosis, y = age_onset, color = entropy2)) + 
+geom_jitter(stat = "identity", weight = 4) +
+  labs(x = "Diagnosis",
+  y = "Age Onset",
+  title = "Entropy 2 of each diagnosis group") +
+theme_bw()
+
+parkinsons_dataset %>% 
+  drop_na(tremorRest_head) %>% 
+  ggplot(aes(x = diagnosis, y = age_onset, color = accel_speech_time1)) + 
+geom_jitter(stat = "identity") +
+  labs(x = "Diagnosis",
+  y = "Age Onset",
+  title = "Accelerated Speech Time of each diagnosis group") +
+theme_bw()
+
+parkinsons_dataset %>% 
+  drop_na(posture) %>% 
+  ggplot(aes(x = age_onset, y = posture, color = diagnosis)) + 
+geom_jitter(stat = "identity") +
+theme_bw()
+
+parkinsons_dataset %>% 
+  drop_na(posture) %>% 
+  ggplot(aes(x = duration, y = age_onset, color = diagnosis)) + 
+geom_jitter(stat = "identity") +
+geom_smooth(method = "lm", color = "lightblue", se=FALSE) +
+theme_bw()
+
+```
+
+
+```{r}
+attach(parkinsons_dataset)
+plot(diagnosis,rigid_neck, main="Scatterplot of diagnosis neck rigidity")
+plot(diagnosis,rigid_RUE, main="Scatterplot of diagnosis RUE rigidity")
+plot(diagnosis,rigid_LUE, main="Scatterplot of diagnosis LUE rigidity")
+plot(diagnosis,rigid_RLE, main="Scatterplot of diagnosis RLE rigidity")
+plot(diagnosis,rigid_LLE, main="Scatterplot of diagnosis LLE rigidity")
+
+plot(diagnosis,fingertaps_RUE, main="Scatterplot of diagnosis fingertaps_RUE")
+plot(diagnosis,fingertaps_LUE, main="Scatterplot of diagnosis fingertaps_LUE")
+plot(diagnosis,handmove_RUE, main="Scatterplot of diagnosis handmove_RUE")
+plot(diagnosis,handmove_LUE, main="Scatterplot of diagnosis handmove_LUE")
+
+plot(diagnosis,rapidAltMove_RUE, main="Scatterplot of diagnosis rapidAltMove_RUE")
+plot(diagnosis,rapidAltMove_LUE, main="Scatterplot of diagnosis rapidAltMove_LUE")
+plot(diagnosis,legAg_RLE, main="Scatterplot of diagnosis legAg_RLE")
+plot(diagnosis,legAG_LLE, main="Scatterplot of diagnosis legAG_LLE")
+```
+```{r}
+summary(parkinsons_dataset)
+
+lm(age_onset ~ diagnosis + entropy1 + entropy2 + posture + gait + post_stability + brady_hypo + chair, data = parkinsons_dataset) %>%
+  tbl_regression(estimate_fun = function(x) style_number(x, digits = 3))
+
+
+lm(age_onset ~ diagnosis + rate_speech_time1 + accel_speech_time1 + dur_pause_int1 + dur_voice_int1 + gap_voiced_int1 + dur_unvoiced_stops1 + decay_fric1 + rel_loud_resp1 + pause_int_resp1 + rate_speech_resp1 + latency_resp1, data = parkinsons_dataset) %>%
+  tbl_regression(estimate_fun = function(x) style_number(x, digits = 3))
+
+
+lm(age_onset ~ diagnosis + rate_speech_time2 + accel_speech_time2 + dur_pause_int2 + dur_voice_int2 + gap_voiced_int2 + dur_unvoiced_stops2 + decay_fric2 + rel_loud_resp2 + pause_int_resp2 + rate_speech_resp2 + latency_resp2, data = parkinsons_dataset) %>%
+  tbl_regression(estimate_fun = function(x) style_number(x, digits = 3))
+
+
+
+pd_model <- lm(age_onset ~ diagnosis + brady_hypo + entropy1 + entropy2, data = parkinsons_dataset)
+summary(pd_model)
+
+pd_model <- lm(age_onset ~ diagnosis + chair + posture + gait + post_stability, data = parkinsons_dataset)
+summary(pd_model)
+#***
+pd_model <- lm(age_onset ~ age + duration, data = parkinsons_dataset)
+summary(pd_model) 
+
+pd_model <- lm(duration ~ tremorRest_head + tremorRest_RUE + tremorRest_LUE+tremorRest_RLE+tremorRest_LLE+AP_tremor_RUE+AP_tremor_LUE+rigid_neck+rigid_RUE+rigid_LUE+rigid_RLE+rigid_LLE+fingertaps_RUE+fingertaps_LUE+handmove_RUE+handmove_LUE+rapidAltMove_RUE+rapidAltMove_LUE+legAg_RLE+legAG_LLE + rate_speech_time1 + accel_speech_time1 + dur_pause_int1 + dur_voice_int1 + gap_voiced_int1 + dur_unvoiced_stops1 + decay_fric1 + rel_loud_resp1 + pause_int_resp1 + rate_speech_resp1 + latency_resp1 + rate_speech_time2 + accel_speech_time2 + dur_pause_int2 + dur_voice_int2 + gap_voiced_int2 + dur_unvoiced_stops2 + decay_fric2 + rel_loud_resp2 + pause_int_resp2 + rate_speech_resp2 + latency_resp2, data = parkinsons_dataset)
+summary(pd_model) 
+```
+```{r}
+glm(formula = diagnosis ~ age, family = binomial,
+    data = parkinsons_dataset)
+
+glm(formula = diagnosis ~ facial + speech + updrs + gait, family = binomial,
+    data = parkinsons_dataset)
+```
+
 
 ## Models and Statistical Tests
 

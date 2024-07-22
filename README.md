@@ -1,6 +1,8 @@
-# COSMOS Project Template
-One person from your team should fork this repository to their github account.
+# COSMOS 2024 Capstone Project 
+One person from our team has forked this repository to their github account.
 
-Add all member names to this readme.
+All member names:
+Emma, Jasmine, Leila, Madeline
 
-Add all team members to the project as collaborators through the 'settings' menu above.
+All team members were added to the project as collaborators through the 'settings' menu.
+
