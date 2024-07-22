@@ -236,6 +236,37 @@ parkinsons_dataset %>%
   geom_point(aes(shape = diagnosis))
 ```
 
+```{r}
+parkinsons_dataset %>% 
+  ggplot(aes(x = id, y = dur_unvoiced_stops1)) +
+  geom_boxplot(aes(color = pd)) +
+  geom_point(aes(shape = pd))
+
+parkinsons_dataset %>% 
+  ggplot(aes(x = id, y = dur_unvoiced_stops2)) +
+  geom_boxplot(aes(color = pd)) +
+  geom_point(aes(shape = pd))
+
+parkinsons_dataset %>% 
+  ggplot(aes(x = id, y = decay_fric1)) +
+  geom_boxplot(aes(color = pd)) +
+  geom_point(aes(shape = pd))
+
+parkinsons_dataset %>% 
+  ggplot(aes(x = id, y = decay_fric2)) +
+  geom_boxplot(aes(color = pd)) +
+  geom_point(aes(shape = pd))
+
+parkinsons_dataset %>% 
+  ggplot(aes(x = id, y = rel_loud_resp1)) +
+  geom_boxplot(aes(color = pd)) +
+  geom_point(aes(shape = pd))
+
+parkinsons_dataset %>% 
+  ggplot(aes(x = id, y = rel_loud_resp2)) +
+  geom_boxplot(aes(color = pd)) +
+  geom_point(aes(shape = pd))
+```
 
 ## Models and Statistical Tests
 
@@ -273,18 +304,26 @@ logistic_model_2 %>%
 
 ```{r}
 # voice variable tests
-
+# there is NO CORRELATION WHATSOEVER
 logistic_model_voice1 <- parkinsons_dataset %>% 
-  glm(diagnosis ~ dur_unvoiced_stops1 + dur_unvoiced_stops2, family = binomial, data = .)
+  glm(pd ~ dur_unvoiced_stops1 + dur_unvoiced_stops2, family = binomial, data = .)
 summary(logistic_model_voice1)
 
 logistic_model_voice2 <- parkinsons_dataset %>% 
-  glm(diagnosis ~ decay_fric1 + decay_fric2, family = binomial, data = .)
+  glm(pd ~ decay_fric1 + decay_fric2, family = binomial, data = .)
 summary(logistic_model_voice2)
 
 logistic_model_voice3 <- parkinsons_dataset %>% 
-  glm(diagnosis ~ rel_loud_resp1 + rel_loud_resp2, family = binomial, data = .)
+  glm(pd ~ rel_loud_resp1 + rel_loud_resp2, family = binomial, data = .)
 summary(logistic_model_voice3)
+
+logistic_model_voice_all <- parkinsons_dataset %>% 
+  glm(pd ~ entropy1 + rate_speech_time1 + accel_speech_time1 + dur_pause_int1 + dur_voice_int1 + gap_voiced_int1 + dur_unvoiced_stops1 + decay_fric1 + rel_loud_resp1 + pause_int_resp1 + rate_speech_resp1 + latency_resp1 + entropy2 + rate_speech_time2 + accel_speech_time2 + dur_pause_int2 + dur_voice_int2 + gap_voiced_int2 + dur_unvoiced_stops2 + decay_fric2 + rel_loud_resp2 + pause_int_resp2 + rate_speech_resp2 + latency_resp2, family = binomial, data = .)
+summary(logistic_model_voice_all)
+
+logistic_model_rate_speech <- parkinsons_dataset %>% 
+  glm(pd ~ rate_speech_resp1 + rbd, family = binomial, data = .)
+summary(logistic_model_rate_speech)
 ```
 
 ## Results
