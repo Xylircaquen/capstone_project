@@ -191,11 +191,52 @@ predicted_classes_mean <- ifelse(pred_prob_mean > 0.5, TRUE, FALSE)
 mean(predicted_classes1 == test_data$pd)
 mean(predicted_classes2 == test_data$pd)
 mean(predicted_classes_mean == test_data$pd)
-
-#lasso
-#cv.glmnet()
 ```
 
+```{r}
+# lasso
+x1 <- parkinsons_dataset %>% 
+  select(age, entropy1, rate_speech_time1, accel_speech_time1, dur_pause_int1, dur_voice_int1, gap_voiced_int1, dur_unvoiced_stops1, decay_fric1, rel_loud_resp1, pause_int_resp1, rate_speech_resp1, latency_resp1) %>% 
+  as.matrix()
+x2 <- parkinsons_dataset %>% 
+  select(age, entropy2, rate_speech_time2, accel_speech_time2, dur_pause_int2, dur_voice_int2, gap_voiced_int2, dur_unvoiced_stops2, decay_fric2, rel_loud_resp2, pause_int_resp2, rate_speech_resp2, latency_resp2) %>% 
+  as.matrix()
+
+lasso_model1 <- cv.glmnet(x1, parkinsons_dataset$pd, family = 'binomial')
+lasso_model2 <- cv.glmnet(x2, parkinsons_dataset$pd, family = 'binomial')
+
+plot(lasso_model1)
+plot(lasso_model2)
+
+coef(lasso_model1, s = lasso_model1$lambda.min)
+coef(lasso_model2, s = lasso_model2$lambda.min)
+
+# only important variables: rate_speech_time1, dur_pause_int1, dur_pause_int2
+```
+```{r}
+# graphing important variables: rate_speech_time1, dur_pause_int1, dur_pause_int2
+parkinsons_dataset %>% 
+  ggplot(aes(x = id, y = rate_speech_time1, color = pd)) +
+  geom_boxplot()
+parkinsons_dataset %>% 
+  ggplot(aes(x = id, y = dur_pause_int1, color = pd)) +
+  geom_boxplot()
+parkinsons_dataset %>% 
+  ggplot(aes(x = id, y = dur_pause_int2, color = pd)) +
+  geom_boxplot()
+```
+```{r}
+# test and train important variables
+logistic_model_important <- glm(pd ~ rate_speech_time1 + dur_pause_int1 + dur_pause_int2, family = binomial, data = train_data)
+summary(logistic_model_important)
+
+pred_prob_important <- logistic_model_important %>% 
+  predict(test_data, type = "response")
+
+predicted_classes_important <- ifelse(pred_prob_important > 0.5, TRUE, FALSE)
+
+mean(predicted_classes_important == test_data$pd)
+```
 
 ## Results
 
