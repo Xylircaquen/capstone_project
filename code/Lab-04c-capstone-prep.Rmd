@@ -180,21 +180,20 @@ pred_prob1 <- logistic_model_voice1 %>%
 pred_prob2 <- logistic_model_voice2 %>% 
   predict(test_data, type = "response")
 
-#fix whatever this thing is
-#pred_prob_mean <- mean(pred_prob1, pred_prob2)
+pred_prob_mean <- (pred_prob1 + pred_prob_2) / 2
 
 # average the output
 predicted_classes1 <- ifelse(pred_prob1 > 0.5, TRUE, FALSE)
 predicted_classes2 <- ifelse(pred_prob2 > 0.5, TRUE, FALSE)
-#predicted_classes_mean <- ifelse(pred_prob_mean > 0.5, TRUE, FALSE)
+predicted_classes_mean <- ifelse(pred_prob_mean > 0.5, TRUE, FALSE)
 
 # find the accuracy
 mean(predicted_classes1 == test_data$pd)
 mean(predicted_classes2 == test_data$pd)
-#mean(predicted_classes_mean == test_data$pd)
+mean(predicted_classes_mean == test_data$pd)
 
 #lasso
-cv.glmnet()
+#cv.glmnet()
 ```
 
 
