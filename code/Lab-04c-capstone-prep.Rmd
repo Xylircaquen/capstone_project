@@ -208,7 +208,7 @@ coef(lasso_model, s = lasso_model$lambda.min)
 lambda_values <- log(lasso_model$lambda)
 cv_errors <- lasso_model$cvm
 
-points(lambda_values, cv_errors, col = "orange", pch = 16)
+points(lambda_values, cv_errors, col = "deepskyblue", pch = 16)
 
 # only important variables: rate_speech_time1, dur_pause_int1, dur_pause_int2
 ```
