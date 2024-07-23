@@ -211,27 +211,24 @@ coef(lasso_model, s = lasso_model$lambda.min)
 # graphing important variables: rate_speech_time1, dur_pause_int1, dur_pause_int2
 parkinsons_dataset %>% 
   ggplot(aes(x = rate_speech_time1, y = pd, color = pd)) +
-  geom_jitter() +
+  geom_jitter(size = 3) +
   scale_color_manual(values = c("deepskyblue", "orange"), labels = c("TRUE" = "PD", "FALSE" = "No PD")) +
   scale_y_discrete(labels = c("TRUE" = "PD", "FALSE" = "No PD")) +
-  labs(x = "Rate of Speech Timing from Reading", y = "Status of Parkinson's Disease",  title = "Reading RST of Patients with PD Compared to those without PD", color = NULL) +
-  theme_bw()
+  labs(x = "Rate of Speech Timing from Reading", y = "Status of Parkinson's Disease",  title = "Reading RST of Patients with PD Compared to those without PD", color = NULL)
 
 parkinsons_dataset %>% 
   ggplot(aes(x = dur_pause_int1, y = pd, color = pd)) +
-  geom_jitter() +
+  geom_jitter(size = 3) +
   scale_color_manual(values = c("deepskyblue", "orange"), labels = c("TRUE" = "PD", "FALSE" = "No PD")) +
   scale_y_discrete(labels = c("TRUE" = "PD", "FALSE" = "No PD")) +
-  labs(x = "Duration of Pause Intervals from Reading (ms)", y = "Status of Parkinson's Disease",  title = "Reading DPI of Patients with PD Compared to those without PD", color = NULL) +
-  theme_bw()
+  labs(x = "Duration of Pause Intervals from Reading (ms)", y = "Status of Parkinson's Disease",  title = "Reading DPI of Patients with PD Compared to those without PD", color = NULL)
 
 parkinsons_dataset %>% 
   ggplot(aes(x = dur_pause_int2, y = pd, color = pd)) +
-  geom_jitter() +
+  geom_jitter(size = 3) +
   scale_color_manual(values = c("deepskyblue", "orange"), labels = c("TRUE" = "PD", "FALSE" = "No PD")) +
   scale_y_discrete(labels = c("TRUE" = "PD", "FALSE" = "No PD")) +
-  labs(x = "Duration of Pause Intervals from Monologuing (ms)", y = "Status of Parkinson's Disease",  title = "Monologuing DPI of Patients with PD Compared to those without PD", color = NULL) +
-  theme_bw()
+  labs(x = "Duration of Pause Intervals from Monologuing (ms)", y = "Status of Parkinson's Disease",  title = "Monologuing DPI of Patients with PD Compared to those without PD", color = NULL)
 ```
 ```{r}
 # test and train important variables
