@@ -129,23 +129,17 @@ glimpse(parkinsons_dataset)
 ggplot(parkinsons_dataset, aes(x = speech, y = duration, color=diagnosis)) + 
          geom_jitter()
 
-ggplot(just_park, aes(x = duration, y = speech, color=diagnosis)) + 
-         geom_jitter()
+dur_rigidLLE_model <- glm(duration ~ rigid_LLE, data = parkinsons_dataset)
+summary(dur_rigidLLE_model)
 
-dur_rigidLLE_model <- glm(duration ~ rigid_LLE, data = just_park)
-summary(dur_rigidLLE)
-
-dur_rapidAltMove_RUE_model <- glm(duration ~ rapidAltMove_RUE, data = just_park)
+dur_rapidAltMove_RUE_model <- glm(duration ~ rapidAltMove_RUE, data = parkinsons_dataset)
 summary(dur_rapidAltMove_RUE_model)
 
-dur_legAg_RLE_model <- glm(duration ~ legAg_RLE, data = just_park)
+dur_legAg_RLE_model <- glm(duration ~ legAg_RLE, data = parkinsons_dataset)
 summary(dur_legAg_RLE_model)
 
-dur_alltremors_model <- glm(duration ~ tremorRest_head + tremorRest_RUE + tremorRest_LUE + tremorRest_LLE + tremorRest_RLE, data = just_park)
+dur_alltremors_model <- glm(duration ~ tremorRest_head + tremorRest_RUE + tremorRest_LUE + tremorRest_LLE + tremorRest_RLE, data = parkinsons_dataset)
 summary(dur_alltremors_model)
-
-model <- lm(diagnosis ~ entropy1, data = parkinsons_dataset)
-summary(model)
 
 parkinsons_dataset <- parkinsons_dataset %>% 
   mutate(
@@ -181,26 +175,13 @@ summary(model)
 speech_all <- glm(pd ~ entropy2 + rate_speech_time2 + accel_speech_time2 + dur_pause_int2 + dur_voice_int2 + gap_voiced_int2 + dur_unvoiced_stops2 + decay_fric2 + rel_loud_resp2 + pause_int_resp2 + rate_speech_resp2 + latency_resp2 + entropy1 + rate_speech_time1 + accel_speech_time1 + dur_pause_int1 + dur_voice_int1 + gap_voiced_int1 + dur_unvoiced_stops1 + decay_fric1 + rel_loud_resp1 + pause_int_resp1 + rate_speech_resp1 + latency_resp1, family='binomial', data = parkinsons_dataset)
 summary(model)
 
-install.packages('rsample')
 library(rsample)
 library(tidyverse)
 library(survival)
 library(gtsummary)
 library(glmnet)
-install.packages("glmnet")
-library(glmnet)
 
-set.seed(0)
-data_split <- initial_split(parkinsons_dataset, prop = 0.7) 
-train_data <- training(data_split)
-test_data <- testing(data_split)
-logistic_model1 <- glm(pd ~ entropy1 + rate_speech_time1 + accel_speech_time1 + dur_pause_int1 + dur_voice_int1 + gap_voiced_int1 + dur_unvoiced_stops1 + decay_fric1 + rel_loud_resp1 + pause_int_resp1 + rate_speech_resp1 + latency_resp1, family='binomial', data=train_data)
-summary(logistic_model1)
-logistic_model1 %>% tbl_regression(estimate_fun = function(x) style_number(x, digits = 3), exponentiate = TRUE)
-pred_prob1 <- logistic_model1 %>% 
-  predict(test_data,type="response")
-predicted.classes1 <- ifelse(pred_prob1 > 0.5, "TRUE", "FALSE")
-mean(predicted.classes1 == test_data$pd)
+
 
 
 set.seed(0)
@@ -219,30 +200,20 @@ pred_prob_mean <- (pred_prob1 + pred_prob2) / 2
 predicted_classes_mean <- ifelse(pred_prob_mean > 0.5, TRUE, FALSE)
 mean(predicted_classes_mean == test_data$pd)
 
-install.packages("glmnet")
-response_pd <-parkinsons_dataset$pd
-predictors_speech1 <- data.matrix(parkinsons_dataset[, c('entropy1', 'rate_speech_time1', 'accel_speech_time1', 'dur_pause_int1', 'dur_voice_int1', 'gap_voiced_int1', 'dur_unvoiced_stops1', 'decay_fric1', 'rel_loud_resp1', 'pause_int_resp1', 'rate_speech_resp1', 'latency_resp1')])
-library(glmnet)
-cv_model <- cv.glmnet(predictors_speech1, response_pd, alpha = 1)
-best_lambda <- cv_model$lambda.min
-best_lambda
-plot(cv_model) 
-best_model <- glmnet(predictors_speech1, response_pd, alpha = 1, lambda = best_lambda)
-coef(best_model)
-
 response_pd <-parkinsons_dataset$pd
 predictors_speech1 <- data.matrix(parkinsons_dataset[, c('entropy1', 'rate_speech_time1', 'accel_speech_time1', 'dur_pause_int1', 'dur_voice_int1', 'gap_voiced_int1', 'dur_unvoiced_stops1', 'decay_fric1', 'rel_loud_resp1', 'pause_int_resp1', 'rate_speech_resp1', 'latency_resp1', 'entropy2', 'rate_speech_time2', 'accel_speech_time2', 'dur_pause_int2', 'dur_voice_int2', 'gap_voiced_int2', 'dur_unvoiced_stops2', 'decay_fric2', 'rel_loud_resp2', 'pause_int_resp2', 'rate_speech_resp2', 'latency_resp2')])
 library(glmnet)
 cv_model <- cv.glmnet(predictors_speech1, response_pd, alpha = 1)
 best_lambda <- cv_model$lambda.min
 best_lambda
-plot(cv_model) 
+plot(cv_model)
 best_model <- glmnet(predictors_speech1, response_pd, alpha = 1, lambda = best_lambda)
 coef(best_model)
+
 #According to Lasso Test the important varibales are:
 #rate_speech_time1   -0.0001383232
 #dur_pause_int1       0.0002775279
-#dur_pause_int2       0.0003860451
+#dur_pause_int2       0.0004353519
 
 library(rsample)
 library(tidyverse)
@@ -261,11 +232,32 @@ pred_prob2 <- logistic_model2 %>%
 predicted.classes2 <- ifelse(pred_prob2 > 0.5, TRUE, FALSE)
 mean(predicted.classes2 == test_data$pd)
 
+#dur pause 1
+ggplot(parkinsons_dataset, aes(x = dur_pause_int1, y = pd, color = pd)) + 
+         geom_boxplot() +
+  stat_summary(fun.y = "mean", geom = "point", shape = 18, size = 3, color = "navyblue") +
+  scale_color_manual(values = c("deepskyblue","orange"), labels = c("TRUE" = "PD", "FALSE" = "No PD")) +
+         scale_y_discrete(labels = c("TRUE" = "PD", "FALSE" = "No PD")) +
+         labs(x = "Duration of Pause Intervals from Reading (ms)", y = "Status of Parkinson's Disease",  title = "Reading DPI of Patients with PD Compared to those without PD", , color = NULL) +
+  theme_bw()
 
-ggplot(parkinsons_dataset, aes(x = dur_pause_int1, y = rate_speech_time1 , color=pd)) + 
-         geom_jitter()
+# dur pause 2
+ggplot(parkinsons_dataset, aes(x = dur_pause_int2, y = pd, color = pd)) + 
+         geom_boxplot() +
+  stat_summary(fun.y = "mean", geom = "point", shape = 18, size = 3, color = "navyblue") +
+  scale_color_manual(values = c("deepskyblue","orange"), labels = c("TRUE" = "PD", "FALSE" = "No PD")) +
+  scale_y_discrete(labels = c("TRUE" = "PD", "FALSE" = "No PD")) +
+         labs(x = "Duration of Pause Intervals from Monologue (ms)", y = "Status of Parkinson's Disease",  title = "Monologue DPI of Patients with PD Compared to those without PD", color = NULL) +
+  theme_bw()
 
-
+# rate_speech_time1
+ggplot(parkinsons_dataset, aes(x = rate_speech_time1, y = pd, color = pd)) + 
+         geom_boxplot() +
+  stat_summary(fun.y = "mean", geom = "point", shape = 18, size = 3, color = "navyblue") +
+  scale_color_manual(values = c("deepskyblue","orange"), labels = c("TRUE" = "PD", "FALSE" = "No PD")) +
+         scale_y_discrete(labels = c("TRUE" = "PD", "FALSE" = "No PD")) +
+         labs(x = "Rate of Speech Timing from Reading", y = "Status of Parkinson's Disease",  title = "Reading RST of Patients with PD Compared to those without PD", color = NULL) +
+  theme_bw()
 
 
 ```
