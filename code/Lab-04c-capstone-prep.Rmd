@@ -167,10 +167,10 @@ train_data <- training(data_split)
 test_data <- testing(data_split)
 
 # create 2 models (read/1 variables verse monologue/2 variables)
-logistic_model_voice1 <- glm(pd ~ age + gender + entropy1 + rate_speech_time1 + accel_speech_time1 + dur_pause_int1 + dur_voice_int1 + gap_voiced_int1 + dur_unvoiced_stops1 + decay_fric1 + rel_loud_resp1 + pause_int_resp1 + rate_speech_resp1 + latency_resp1, family = binomial, data = train_data)
+logistic_model_voice1 <- glm(pd ~ entropy1 + rate_speech_time1 + accel_speech_time1 + dur_pause_int1 + dur_voice_int1 + gap_voiced_int1 + dur_unvoiced_stops1 + decay_fric1 + rel_loud_resp1 + pause_int_resp1 + rate_speech_resp1 + latency_resp1, family = binomial, data = train_data)
 summary(logistic_model_voice1)
 
-logistic_model_voice2 <- glm(pd ~ age + gender + entropy2 + rate_speech_time2 + accel_speech_time2 + dur_pause_int2 + dur_voice_int2 + gap_voiced_int2 + dur_unvoiced_stops2 + decay_fric2 + rel_loud_resp2 + pause_int_resp2 + rate_speech_resp2 + latency_resp2, family = binomial, data = train_data)
+logistic_model_voice2 <- glm(pd ~ entropy2 + rate_speech_time2 + accel_speech_time2 + dur_pause_int2 + dur_voice_int2 + gap_voiced_int2 + dur_unvoiced_stops2 + decay_fric2 + rel_loud_resp2 + pause_int_resp2 + rate_speech_resp2 + latency_resp2, family = binomial, data = train_data)
 summary(logistic_model_voice2)
 
 # train the models with test data separately and test the models separately
@@ -180,7 +180,7 @@ pred_prob1 <- logistic_model_voice1 %>%
 pred_prob2 <- logistic_model_voice2 %>% 
   predict(test_data, type = "response")
 
-pred_prob_mean <- (pred_prob1 + pred_prob_2) / 2
+pred_prob_mean <- (pred_prob1 + pred_prob2) / 2
 
 # average the output
 predicted_classes1 <- ifelse(pred_prob1 > 0.5, TRUE, FALSE)
@@ -195,21 +195,15 @@ mean(predicted_classes_mean == test_data$pd)
 
 ```{r}
 # lasso
-x1 <- parkinsons_dataset %>% 
-  select(age, entropy1, rate_speech_time1, accel_speech_time1, dur_pause_int1, dur_voice_int1, gap_voiced_int1, dur_unvoiced_stops1, decay_fric1, rel_loud_resp1, pause_int_resp1, rate_speech_resp1, latency_resp1) %>% 
-  as.matrix()
-x2 <- parkinsons_dataset %>% 
-  select(age, entropy2, rate_speech_time2, accel_speech_time2, dur_pause_int2, dur_voice_int2, gap_voiced_int2, dur_unvoiced_stops2, decay_fric2, rel_loud_resp2, pause_int_resp2, rate_speech_resp2, latency_resp2) %>% 
+x <- parkinsons_dataset %>% 
+  select(entropy1, rate_speech_time1, accel_speech_time1, dur_pause_int1, dur_voice_int1, gap_voiced_int1, dur_unvoiced_stops1, decay_fric1, rel_loud_resp1, pause_int_resp1, rate_speech_resp1, latency_resp1, entropy2, rate_speech_time2, accel_speech_time2, dur_pause_int2, dur_voice_int2, gap_voiced_int2, dur_unvoiced_stops2, decay_fric2, rel_loud_resp2, pause_int_resp2, rate_speech_resp2, latency_resp2) %>% 
   as.matrix()
 
-lasso_model1 <- cv.glmnet(x1, parkinsons_dataset$pd, family = 'binomial')
-lasso_model2 <- cv.glmnet(x2, parkinsons_dataset$pd, family = 'binomial')
+lasso_model <- cv.glmnet(x, parkinsons_dataset$pd, family = "binomial")
 
-plot(lasso_model1)
-plot(lasso_model2)
+plot(lasso_model)
 
-coef(lasso_model1, s = lasso_model1$lambda.min)
-coef(lasso_model2, s = lasso_model2$lambda.min)
+coef(lasso_model, s = lasso_model$lambda.min)
 
 # only important variables: rate_speech_time1, dur_pause_int1, dur_pause_int2
 ```
@@ -236,6 +230,8 @@ pred_prob_important <- logistic_model_important %>%
 predicted_classes_important <- ifelse(pred_prob_important > 0.5, TRUE, FALSE)
 
 mean(predicted_classes_important == test_data$pd)
+
+# IGNORE THE P-VALUES
 ```
 
 ## Results
