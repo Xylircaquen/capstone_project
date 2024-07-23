@@ -173,7 +173,8 @@ model <- glm(pd ~ entropy2 + rate_speech_time2 + accel_speech_time2 + dur_pause_
 summary(model)
 
 speech_all <- glm(pd ~ entropy2 + rate_speech_time2 + accel_speech_time2 + dur_pause_int2 + dur_voice_int2 + gap_voiced_int2 + dur_unvoiced_stops2 + decay_fric2 + rel_loud_resp2 + pause_int_resp2 + rate_speech_resp2 + latency_resp2 + entropy1 + rate_speech_time1 + accel_speech_time1 + dur_pause_int1 + dur_voice_int1 + gap_voiced_int1 + dur_unvoiced_stops1 + decay_fric1 + rel_loud_resp1 + pause_int_resp1 + rate_speech_resp1 + latency_resp1, family='binomial', data = parkinsons_dataset)
-summary(model)
+summary(speech_all)
+tbl_regression(speech_all)
 
 library(rsample)
 library(tidyverse)
