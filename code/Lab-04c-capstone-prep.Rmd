@@ -39,6 +39,9 @@ We're going to start building our toolbox by adding our functions. Whenever we w
 library(tidyverse)
 library(rsample)
 library(glmnet)
+library(grpreg)
+library(grplasso)
+library(sparsegl)
 
 set.seed(0)
 ```
@@ -212,6 +215,53 @@ points(lambda_values, cv_errors, col = "deepskyblue", pch = 16)
 
 # only important variables: rate_speech_time1, dur_pause_int1, dur_pause_int2
 ```
+
+```{r}
+# using grpreg (all 0s)
+groups <- rep(1:2, each = 12)
+
+lasso_model2 <- grpreg(x, parkinsons_dataset$pd, group = groups, penalty = "grLasso", family = "binomial", alpha = 0.5, standardize = TRUE)
+
+plot(lasso_model2)
+
+select(lasso_model2, "BIC")
+```
+
+```{r}
+# using grplasso (still all 0s)
+groups_with_intercept <- c(NA, groups)
+
+x_with_intercept <- cbind(rep(1, 130), x)
+
+lambda <- lambdamax(x_with_intercept, as.numeric(parkinsons_dataset$pd), index = groups_with_intercept, penscale = sqrt, model = LogReg()) * 0.5^(0:10)
+
+lasso_model3 <- grplasso(x_with_intercept, as.numeric(parkinsons_dataset$pd), index = groups_with_intercept, lambda = lambda, model = LogReg(), standardize = TRUE)
+
+plot(lasso_model3)
+
+coef(lasso_model3)
+```
+
+```{r}
+# plotting entropy 1 and 2 (no difference whatsoever)
+parkinsons_dataset %>% 
+  ggplot(aes(x = entropy1, y = pd)) +
+  geom_jitter()
+
+parkinsons_dataset %>% 
+  ggplot(aes(x = entropy2, y = pd)) +
+  geom_jitter()
+```
+
+```{r}
+# using sparesgl (ALSO all 0s)
+lasso_model4 <- cv.sparsegl(x, parkinsons_dataset$pd, group = groups, family = "binomial", pred.loss = "mse")
+
+plot(lasso_model4)
+
+coef(lasso_model4, s = "lambda.1se")
+```
+
 ```{r}
 # graphing important variables: rate_speech_time1, dur_pause_int1, dur_pause_int2
 parkinsons_dataset %>% 
@@ -231,7 +281,7 @@ parkinsons_dataset %>%
 parkinsons_dataset %>% 
   ggplot(aes(x = dur_pause_int2, y = pd, color = pd)) +
   geom_jitter(size = 3) +
-  scale_color_manual(values = c("deepskyblue", "orange"), labels = c("TRUE" = "PD", "FALSE" = "No PD")) +
+  scale_color_manual(values = c("deepskyblue", "cadetblue2"), labels = c("TRUE" = "PD", "FALSE" = "No PD")) +
   scale_y_discrete(labels = c("TRUE" = "PD", "FALSE" = "No PD")) +
   labs(x = "Duration of Pause Intervals from Monologuing (ms)", y = "Status of Parkinson's Disease",  title = "Monologuing DPI of Patients with PD Compared to those without PD", color = NULL)
 ```
