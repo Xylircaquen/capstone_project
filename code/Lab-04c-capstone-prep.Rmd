@@ -178,7 +178,7 @@ set.seed(0)
 data_split <- initial_split(parkinsons_dataset, prop = 0.7) 
 train_data <- training(data_split)
 test_data <- testing(data_split)
-logistic_model2 <- glm(pd ~ entropy2 + rate_speech_time2 + accel_speech_time2 + dur_pause_int2 + dur_voice_int2 + gap_voiced_int2 + dur_unvoiced_stops2 + decay_fric2 + rel_loud_resp2 + pause_int_resp2 + rate_speech_resp2 + latency_resp2, family= binomial, data=train_data)
+logistic_model2 <- glm(pd ~ entropy2 + rate_speech_time2 + accel_speech_time2 + dur_pause_int2 + dur_voice_int2 + gap_voiced_int2 + dur_unvoiced_stops2 + decay_fric2 + rel_loud_resp2 + pause_int_resp2 + rate_speech_resp2 + latency_resp2 + entropy1 + rate_speech_time1 + accel_speech_time1 + dur_pause_int1 + dur_voice_int1 + gap_voiced_int1 + dur_unvoiced_stops1 + decay_fric1 + rel_loud_resp1 + pause_int_resp1 + rate_speech_resp1 + latency_resp1, family= binomial, data=train_data)
 summary(logistic_model2)
 logistic_model2 %>% tbl_regression(estimate_fun = function(x) style_number(x, digits = 3), exponentiate = TRUE)
 pred_prob2 <- logistic_model2 %>% 
@@ -295,11 +295,42 @@ plot(performance_obj, col = "deepskyblue", lwd = 2, main = "ROC Curve (ROCR)")
 auc_value_rocr <- performance(prediction_obj, measure = "auc")
 auc_value_rocr <- auc_value_rocr@y.values[[1]]
 print(paste("AUC (ROCR):", auc_value_rocr))
+```
 
 
+```{r data_cleaning}
 
+install.packages('ranger')
 
+park.train <- select(train_data, pd, 45:68)
 
+parkRF <- select(parkinsons_dataset, pd, 45:68)
+library(ranger)
+train.idx <-sample(nrow(parkRF), 2/3 * nrow(parkRF))
+park.train <- parkRF[train.idx, ]
+park.test <- parkRF[-train.idx, ]
+park.rg <- ranger(pd~ . , data = train_data, importance = "impurity")
+park.pred <- predict(park.rg, data = test_data)
+table(park.test$pd, park.pred$predictions)
+vars <- park.rg$variable.importance
+
+vars
+
+accel_speech_time2
+dur_pause_int2
+
+     entropy1         rate_speech_time1  accel_speech_time1      dur_pause_int1 
+          1.0954938           1.2262261           1.0097911           1.3290853 
+     dur_voice_int1     gap_voiced_int1 dur_unvoiced_stops1         decay_fric1 
+          1.0610927           1.2642894           0.9405020           1.0635630 
+     rel_loud_resp1     pause_int_resp1   rate_speech_resp1       latency_resp1 
+          1.2638849           0.7517284           1.2588394           0.8801236 
+           entropy2   rate_speech_time2  -------------      -------------- 
+          0.7465149           1.5478808           3.0226179           2.3228441 
+     dur_voice_int2     gap_voiced_int2 dur_unvoiced_stops2         decay_fric2 
+          1.2935573           0.9230569           1.1129492           1.7472662 
+     rel_loud_resp2     pause_int_resp2   rate_speech_resp2       latency_resp2 
+          0.7874687           0.6981478           1.2894073           1.8770645 
 ```
 
 ## Exploratory Data Analysis
