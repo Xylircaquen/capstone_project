@@ -103,8 +103,9 @@ parkinsons_dataset <- parkinsons_dataset %>% rename(entropy2 = `Entropy  of  spe
 
 ```
 ```{r}
-# EDA fun
-library(ggplot2)
+
+ 
+
 ```
 
 
@@ -124,22 +125,7 @@ parkinsons_dataset <- parkinsons_dataset %>%
   select(id, diagnosis, everything())
 
 library(tidyverse)
-glimpse(parkinsons_dataset)
 
-ggplot(parkinsons_dataset, aes(x = speech, y = duration, color=diagnosis)) + 
-         geom_jitter()
-
-dur_rigidLLE_model <- glm(duration ~ rigid_LLE, data = parkinsons_dataset)
-summary(dur_rigidLLE_model)
-
-dur_rapidAltMove_RUE_model <- glm(duration ~ rapidAltMove_RUE, data = parkinsons_dataset)
-summary(dur_rapidAltMove_RUE_model)
-
-dur_legAg_RLE_model <- glm(duration ~ legAg_RLE, data = parkinsons_dataset)
-summary(dur_legAg_RLE_model)
-
-dur_alltremors_model <- glm(duration ~ tremorRest_head + tremorRest_RUE + tremorRest_LUE + tremorRest_LLE + tremorRest_RLE, data = parkinsons_dataset)
-summary(dur_alltremors_model)
 
 parkinsons_dataset <- parkinsons_dataset %>% 
   mutate(
@@ -174,13 +160,16 @@ summary(model)
 
 speech_all <- glm(pd ~ entropy2 + rate_speech_time2 + accel_speech_time2 + dur_pause_int2 + dur_voice_int2 + gap_voiced_int2 + dur_unvoiced_stops2 + decay_fric2 + rel_loud_resp2 + pause_int_resp2 + rate_speech_resp2 + latency_resp2 + entropy1 + rate_speech_time1 + accel_speech_time1 + dur_pause_int1 + dur_voice_int1 + gap_voiced_int1 + dur_unvoiced_stops1 + decay_fric1 + rel_loud_resp1 + pause_int_resp1 + rate_speech_resp1 + latency_resp1, family='binomial', data = parkinsons_dataset)
 summary(speech_all)
-tbl_regression(speech_all)
 
 library(rsample)
 library(tidyverse)
 library(survival)
 library(gtsummary)
 library(glmnet)
+
+tbl_regression(speech_all)
+
+
 
 
 
@@ -232,6 +221,7 @@ pred_prob2 <- logistic_model2 %>%
   predict(test_data,type="response")
 predicted.classes2 <- ifelse(pred_prob2 > 0.5, TRUE, FALSE)
 mean(predicted.classes2 == test_data$pd)
+predicted.classes2
 
 #dur pause 1
 ggplot(parkinsons_dataset, aes(x = dur_pause_int1, y = pd, color = pd)) + 
@@ -259,6 +249,55 @@ ggplot(parkinsons_dataset, aes(x = rate_speech_time1, y = pd, color = pd)) +
          scale_y_discrete(labels = c("TRUE" = "PD", "FALSE" = "No PD")) +
          labs(x = "Rate of Speech Timing from Reading", y = "Status of Parkinson's Disease",  title = "Reading RST of Patients with PD Compared to those without PD", color = NULL) +
   theme_bw()
+```
+
+
+```{r data_cleaning}
+set.seed(0)
+data_split <- initial_split(parkinsons_dataset, prop = 0.7) 
+train_data <- training(data_split)
+test_data <- testing(data_split)
+logistic_model2 <- glm(pd ~ rate_speech_time1 + dur_pause_int1 + dur_pause_int2, family= binomial, data=train_data)
+summary(logistic_model2)
+logistic_model2 %>% tbl_regression(estimate_fun = function(x) style_number(x, digits = 3), exponentiate = TRUE)
+pred_prob2 <- logistic_model2 %>% 
+  predict(test_data,type="response")
+predicted.classes2 <- ifelse(pred_prob2 > 0.5, TRUE, FALSE)
+mean(predicted.classes2 == test_data$pd)
+
+# Load necessary libraries
+library(pROC)
+library(ROCR)
+
+# Train a logistic regression model
+
+
+model <- glm(pd ~ rate_speech_time1 + dur_pause_int1 + dur_pause_int2, family= binomial, data=train_data)
+
+# Predict probabilities on the test set
+predicted_probs <- model %>% 
+  predict(test_data,type="response")
+
+
+# True labels from test data
+true_labels <- test_data$pd
+
+# Using pROC
+roc_curve <- roc(true_labels, predicted_probs)
+plot(roc_curve, main = "ROC Curve (pROC)", col = "deepskyblue", lwd = 2)
+auc_value <- auc(roc_curve)
+print(paste("AUC (pROC):", auc_value))
+
+# Using ROCR
+prediction_obj <- prediction(predicted_probs, true_labels)
+performance_obj <- performance(prediction_obj, "tpr", "fpr")
+plot(performance_obj, col = "deepskyblue", lwd = 2, main = "ROC Curve (ROCR)")
+auc_value_rocr <- performance(prediction_obj, measure = "auc")
+auc_value_rocr <- auc_value_rocr@y.values[[1]]
+print(paste("AUC (ROCR):", auc_value_rocr))
+
+
+
 
 
 ```
