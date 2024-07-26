@@ -139,7 +139,7 @@ parkinsons_dataset$diagnosis <- parkinsons_dataset$diagnosis %>%
   as.factor()
 
 parkinsons_dataset <- parkinsons_dataset %>% 
-  select(id, diagnosis, everything())
+  dplyr::select(id, diagnosis, everything())
 
 # new data wrangling stuff
 parkinsons_dataset <- parkinsons_dataset %>% 
@@ -153,7 +153,7 @@ parkinsons_dataset <- parkinsons_dataset %>%
       TRUE ~ FALSE
     )
   ) %>% 
-  select(id, diagnosis, pd, rbd, everything())
+  dplyr::select(id, diagnosis, pd, rbd, everything())
 ```
 
 ## Models, Statistical Tests and Fusion
@@ -199,7 +199,7 @@ mean(predicted_classes_mean == test_data$pd)
 ```{r}
 # lasso
 x <- parkinsons_dataset %>% 
-  select(entropy1, rate_speech_time1, accel_speech_time1, dur_pause_int1, dur_voice_int1, gap_voiced_int1, dur_unvoiced_stops1, decay_fric1, rel_loud_resp1, pause_int_resp1, rate_speech_resp1, latency_resp1, entropy2, rate_speech_time2, accel_speech_time2, dur_pause_int2, dur_voice_int2, gap_voiced_int2, dur_unvoiced_stops2, decay_fric2, rel_loud_resp2, pause_int_resp2, rate_speech_resp2, latency_resp2) %>% 
+  dplyr::select(entropy1, rate_speech_time1, accel_speech_time1, dur_pause_int1, dur_voice_int1, gap_voiced_int1, dur_unvoiced_stops1, decay_fric1, rel_loud_resp1, pause_int_resp1, rate_speech_resp1, latency_resp1, entropy2, rate_speech_time2, accel_speech_time2, dur_pause_int2, dur_voice_int2, gap_voiced_int2, dur_unvoiced_stops2, decay_fric2, rel_loud_resp2, pause_int_resp2, rate_speech_resp2, latency_resp2) %>% 
   as.matrix()
 
 lasso_model <- cv.glmnet(x, parkinsons_dataset$pd, family = "binomial")
