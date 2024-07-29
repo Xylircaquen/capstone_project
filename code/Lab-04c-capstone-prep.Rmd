@@ -37,7 +37,7 @@ We're going to start building our toolbox by adding our functions. Whenever we w
 #
 
 library(tidyverse)
-library(GGally)
+#library(GGally)
 library(gtsummary)
 library(rsample)
 
@@ -326,9 +326,9 @@ logistic_model_rate_speech <- parkinsons_dataset %>%
 summary(logistic_model_rate_speech)
 ```
 
-```{r}
+```{r, warning=FALSE}
 # random graph for eda
-pd_test <- parkinsons_dataset %>%
+rbd_test <- parkinsons_dataset[31:130,] %>%
   pivot_longer(cols = 45:68, names_to = "variable", values_to = "value")
 
 facet_labels <- c(
@@ -358,14 +358,15 @@ facet_labels <- c(
   rel_loud_resp2 = "Relative Loudness of Resperation 2"
 )
 
-pd_test %>% 
-  ggplot(aes(x = value, y = pd, fill = pd)) +
+rbd_test %>% 
+  ggplot(aes(x = value, y = rbd, fill = rbd)) +
   geom_boxplot(alpha = 0.8) +
-  scale_fill_manual(values = c("deepskyblue","orange"), labels = c("TRUE" = "PD", "FALSE" = "No PD")) +
-  scale_y_discrete(labels = c("TRUE" = "PD", "FALSE" = "No PD")) +
+  scale_fill_manual(values = c("deepskyblue","orange"), labels = c("TRUE" = "High Risk", "FALSE" = "Healthy")) +
+  scale_y_discrete(labels = c("TRUE" = "High Risk", "FALSE" = "Healthy")) +
   facet_wrap(~ variable, scales = "free_x", nrow = 6, ncol = 4, labeller = labeller(variable = facet_labels)) +
-  labs(x = NULL, y = "Status of Parkinson's Disease",  title = "Vocal Data of Patients with PD Compared to Those Without PD", fill = NULL) +
-  theme_bw()
+  labs(x = NULL, y = "Risk Status of Parkinson's Disease",  title = "Vocal Data of High Risk Patients Compared to Healthy Patients", fill = NULL) +
+  theme_bw() +
+  theme(legend.position = "none")
 ```
 
 
