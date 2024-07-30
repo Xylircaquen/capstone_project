@@ -329,33 +329,14 @@ summary(logistic_model_rate_speech)
 ```{r, warning=FALSE}
 # random graph for eda
 rbd_test <- parkinsons_dataset[31:130,] %>%
-  pivot_longer(cols = 45:68, names_to = "variable", values_to = "value")
+  pivot_longer(cols = c(52, 48, 50, 58, 53), names_to = "variable", values_to = "value")
 
 facet_labels <- c(
-  accel_speech_time1 = "Acceleration of Speech Timing 1",
-  accel_speech_time2 = "Acceleration of Speech Timing 2",
-  decay_fric1 = "Decay of Unvoiced Fricatives 1",
-  decay_fric2 = "Decay of Unvoiced Fricatives 2",
-  dur_pause_int1 = "Duration of Paused Intervals 1",
-  dur_pause_int2 = "Duration of Paused Intervals 2",
-  dur_unvoiced_stops1 = "Duration of Unvoiced Stops 1",
-  dur_unvoiced_stops2 = "Duration of Unvoiced Stops 2",
-  dur_voice_int1 = "Duration of Voiced Stops 1",
-  dur_voice_int2 = "Duration of Voiced Stops 2",
-  entropy1 = "Entropy of Speech Timing 1",
-  entropy2 = "Entropy of Speech Timing 2",
-  gap_voiced_int1 = "Gaping in-between Voiced Intervals 1",
-  gap_voiced_int2 = "Gaping in-between Voiced Intervals 2",
-  latency_resp1 = "Latency of Respiratory Exchange 1",
-  latency_resp2 = "Latency of Respiratory Exchange 2",
-  pause_int_resp1 = "Pause Intervals per Respiration 1",
-  pause_int_resp2 = "Pause Intervals per Respiration 2",
-  rate_speech_resp1 = "Rate of Speech Respiration 1",
-  rate_speech_resp2 = "Rate of Speech Respiration 2",
-  rate_speech_time1 = "Rate of Speech Timing 1",
-  rate_speech_time2 = "Rate of Speech Timing 2",
-  rel_loud_resp1 = "Relative Loudness of Resperation 1",
-  rel_loud_resp2 = "Relative Loudness of Resperation 2"
+  decay_fric1 = "Decay of Unvoiced Fricatives 1", # this one
+  dur_pause_int1 = "Duration of Paused Intervals 1", # this one
+  gap_voiced_int1 = "Gaping in-between Voiced Intervals 1", # this one
+  rate_speech_time2 = "Rate of Speech Timing 2", # this one
+  rel_loud_resp1 = "Relative Loudness of Resperation 1" #this one
 )
 
 rbd_test %>% 
@@ -363,8 +344,8 @@ rbd_test %>%
   geom_boxplot(alpha = 0.8) +
   scale_fill_manual(values = c("deepskyblue","orange"), labels = c("TRUE" = "High Risk", "FALSE" = "Healthy")) +
   scale_y_discrete(labels = c("TRUE" = "High Risk", "FALSE" = "Healthy")) +
-  facet_wrap(~ variable, scales = "free_x", nrow = 6, ncol = 4, labeller = labeller(variable = facet_labels)) +
-  labs(x = NULL, y = "Risk Status of Parkinson's Disease",  title = "Vocal Data of High Risk Patients Compared to Healthy Patients", fill = NULL) +
+  facet_wrap(~ variable, scales = "free_x", nrow = 1, ncol = 5, labeller = labeller(variable = facet_labels)) +
+  labs(x = NULL, y = NULL,  title = "Vocal Data of High Risk Patients Compared to Healthy Patients", fill = NULL) +
   theme_bw() +
   theme(legend.position = "none")
 ```
